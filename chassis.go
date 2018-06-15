@@ -107,6 +107,7 @@ func (c *chassis) initialize() error {
 		return nil
 	}
 	err := config.Init()
+	archaius.ConfigInitCallback = config.Init
 	if err != nil {
 		lager.Logger.Error("Failed to initialize conf,", err)
 		return err

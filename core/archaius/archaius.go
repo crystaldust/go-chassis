@@ -1,6 +1,7 @@
 package archaius
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -86,7 +87,27 @@ type EventListener struct {
 func (e EventListener) Event(event *core.Event) {
 	value := e.Factory.GetConfigurationByKey(event.Key)
 	lager.Logger.Infof("config value after change %s | %s", event.Key, value)
+	fmt.Println("[JUZHEN DEBUG]: ", event.Key, value)
+
+	if event.Key == "managementAbility" {
+		if value != "chassis" {
+			e.Factory.CleanConfigs()
+			fmt.Println("[JUZHEN DEBUG]: transfer management ability to ", value)
+		} else {
+			// e.Factory.Init()
+			// e.Factory.Init()
+			// Init()
+			if ConfigInitCallback != nil {
+				fmt.Println("[JUZHEN DEBUG]: ", "call ConfigInitCallback")
+
+				ConfigInitCallback()
+			}
+			fmt.Println("[JUZHEN DEBUG]: transfer management ability to chasis")
+		}
+	}
 }
+
+var ConfigInitCallback func() error
 
 // Init is to initialize the archaius
 func Init() error {
