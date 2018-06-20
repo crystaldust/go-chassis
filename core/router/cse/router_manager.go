@@ -103,7 +103,8 @@ func (r *routeFileSource) DynamicConfigHandler(core.DynamicConfigCallback) error
 func (r *routeFileSource) GetPriority() int {
 	return routeFileSourcePriority
 }
-func (r *routeFileSource) Cleanup() error { return nil }
+func (r *routeFileSource) Cleanup() error      { return nil }
+func (r *routeFileSource) CleanConfigs() error { return nil }
 
 // initialize the config mgr and add several sources
 func initRouterManager() error {

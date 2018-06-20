@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"errors"
+
 	"github.com/ServiceComb/go-archaius/core"
 	"github.com/ServiceComb/go-chassis/core/archaius"
 	"github.com/ServiceComb/go-chassis/core/config/model"
@@ -93,7 +94,8 @@ func (r *RouteDarkLaunchGovernSource) GetPriority() int {
 }
 
 //Cleanup implements ConfigSource.Cleanup
-func (r *RouteDarkLaunchGovernSource) Cleanup() error { return nil }
+func (r *RouteDarkLaunchGovernSource) Cleanup() error      { return nil }
+func (r *RouteDarkLaunchGovernSource) CleanConfigs() error { return nil }
 
 // Callback callbacks when receive an event
 // only operates after dynamicCallback is initialized
