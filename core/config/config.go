@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/ServiceComb/go-archaius/core"
 	"github.com/ServiceComb/go-chassis/core/archaius"
 	"github.com/ServiceComb/go-chassis/core/common"
 	"github.com/ServiceComb/go-chassis/core/config/model"
@@ -280,6 +281,32 @@ func GetHystrixConfig() *model.HystrixConfig {
 	return HystrixConfig.HystrixConfig
 }
 
+type EventListener struct {
+	archaius.EventListener
+}
+
+func (e EventListener) Event(event *core.Event) {
+	value := e.Factory.GetConfigurationByKey(event.Key)
+
+	fmt.Println("[JUZHEN DEBUG]: ", "config listener triggered!")
+	fmt.Println("[JUZHEN DEBUG]: ", event.Key, value)
+
+	if event.Key == "managementAbility" {
+		if value != "chassis" {
+			e.Factory.CleanConfigs()
+			fmt.Println("[JUZHEN DEBUG]: transfer management ability to ", value)
+		} else {
+			// e.Factory.Init()
+			// e.Factory.Init()
+			archaius.Init()
+			listener.Factory = archaius.DefaultConf.ConfigFactory
+			fmt.Println("[JUZHEN DEBUG]: transfer management ability to chassis")
+		}
+	}
+}
+
+var listener EventListener
+
 // Init is initialize the configuration directory, lager, archaius, route rule, and schema
 func Init() error {
 	err := parsePaasLagerConfig(fileutil.PaasLagerDefinition())
@@ -306,6 +333,10 @@ func Init() error {
 		}
 	}
 	err = archaius.Init()
+	listener = EventListener{}
+	listener.Name = "configHandler"
+	listener.Factory = archaius.DefaultConf.ConfigFactory
+	archaius.RegisterListener(listener, "managementAbility")
 	if err != nil {
 		return err
 	}
