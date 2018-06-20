@@ -1,8 +1,10 @@
 package chassis
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
@@ -206,6 +208,7 @@ func SetDefaultProviderChains(c map[string]string) {
 
 //Run bring up the service,it will not return error,instead just waiting for os signal,and shutdown gracefully
 func Run() {
+	go initDebugHandler()
 	err := goChassis.start()
 	if err != nil {
 		lager.Logger.Error("run chassis fail:", err)
@@ -239,6 +242,23 @@ func Run() {
 		}
 	}
 
+}
+
+func initDebugHandler() {
+	envDebugHandler := os.Getenv("CHASSIS_DEBUG_HANDLER")
+	fmt.Println("[JUZHEN DEBUG]: envDebugHandler: ", envDebugHandler)
+
+	if envDebugHandler == "" {
+		return
+	}
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		bs, _ := json.MarshalIndent(archaius.GetConfigs(), "", "  ")
+		w.WriteHeader(http.StatusOK)
+		w.Write(bs)
+	})
+	http.ListenAndServe(":8881", mux)
 }
 
 //Init prepare the chassis framework runtime
